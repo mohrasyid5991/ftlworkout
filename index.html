@@ -5,96 +5,161 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#064e3b">
 <link rel="manifest" href="manifest.json">
-<title>FTL Workout</title>
+<title>FTL Gym Calendar & History</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#07110d;color:#f5f5f5;font-family:Arial,sans-serif}
-.wrap{max-width:760px;margin:auto;padding:14px}h1{margin:0;font-size:23px}.sub{color:#aeb9b3;font-size:13px;margin:4px 0 14px}
-.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.btn{font:inherit;cursor:pointer;border:1px solid #496257;background:#10231b;color:#fff;border-radius:10px;padding:9px 12px}.primary{background:#087f5b;border-color:#087f5b}
-.card{background:#101d18;border:1px solid #294138;border-radius:16px;padding:14px;margin:10px 0}.monthbar{display:flex;align-items:center;justify-content:space-between}.monthtitle{font-weight:700;font-size:18px}.nav{width:42px;height:42px}
-.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}.dow{text-align:center;color:#91a39a;font-size:11px;padding:4px}.date{min-height:62px;border:1px solid #294138;background:#0e1b16;border-radius:9px;padding:7px;position:relative;cursor:pointer}.date.empty{opacity:.2}.date.today{outline:2px solid #0b8f68}.date.selected{background:#123b2d;border-color:#0b8f68}.date .num{font-weight:700}.date .type{font-size:10px;color:#9ddcc3;margin-top:5px}.date.done:after{content:"✓";position:absolute;right:6px;bottom:4px;color:#79e0b5;font-size:17px;font-weight:800}
-.row{display:flex;align-items:center;gap:11px}.grow{flex:1}.name{font-weight:700;font-size:15px}.meta{color:#aeb9b3;font-size:12px;margin-top:4px}.rec{color:#8fe0bd;font-size:12px;margin-top:4px}
-input[type=number],input[type=text]{background:#07110d;color:#fff;border:1px solid #496257;border-radius:8px;padding:8px}input[type=number]{width:72px}input[type=checkbox]{width:21px;height:21px;accent-color:#0b8f68}
-.history{max-height:340px;overflow:auto}.historyrow{display:flex;justify-content:space-between;border-bottom:1px solid #263a32;padding:9px 0;font-size:13px}.muted{color:#aeb9b3}.green{color:#8fe0bd;font-weight:700}.hidden{display:none!important}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#0d2119;border:1px solid #294138;border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:20px;margin-top:4px}
-@media print{body{background:#fff;color:#111}.no-print{display:none!important}.card{background:#fff;border:1px solid #bbb}.muted,.meta{color:#333}}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#07110d;color:#f5f5f5}
+.wrap{max-width:760px;margin:auto;padding:14px}
+h1{margin:0;font-size:23px}.sub{color:#aeb9b3;font-size:13px;margin:4px 0 14px}
+button{font:inherit;cursor:pointer}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.btn{border:1px solid #496257;background:#10231b;color:#fff;border-radius:10px;padding:9px 12px}
+.btn.primary{background:#087f5b;border-color:#087f5b}
+.card{background:#101d18;border:1px solid #294138;border-radius:16px;padding:14px;margin:10px 0}
+.monthbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.monthtitle{font-size:18px;font-weight:700}.nav{width:40px;height:40px;border-radius:10px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
+.dow{text-align:center;color:#91a39a;font-size:11px;padding:4px}
+.date{min-height:62px;border:1px solid #294138;background:#0e1b16;border-radius:9px;padding:7px;text-align:left;color:#fff;position:relative}
+.date.empty{opacity:.2}.date.today{outline:2px solid #0b8f68}
+.date.selected{background:#123b2d;border-color:#0b8f68}
+.date .num{font-weight:700}.date .type{font-size:10px;color:#9ddcc3;margin-top:5px;line-height:1.2}
+.date.done:after{content:"✓";position:absolute;right:6px;bottom:4px;color:#79e0b5;font-weight:800;font-size:17px}
+.row{display:flex;align-items:center;gap:11px}.grow{flex:1;min-width:0}
+.name{font-weight:700;font-size:15px}.meta{color:#aeb9b3;font-size:12px;margin-top:4px}
+.rec{color:#8fe0bd;font-size:12px;margin-top:4px}
+input[type=number]{width:68px;background:#07110d;color:#fff;border:1px solid #496257;border-radius:8px;padding:8px;font-size:16px}
+input[type=checkbox]{width:21px;height:21px;accent-color:#0b8f68}
+.history{max-height:340px;overflow:auto}
+.historyrow{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #263a32;padding:9px 0;font-size:13px}
+.muted{color:#aeb9b3}.green{color:#8fe0bd;font-weight:700}
+.tip{font-size:12px;color:#c5d0cb;line-height:1.5}
+.print-title{display:none}
+@media print{
+body{background:#fff;color:#111}.wrap{max-width:none;padding:0}
+.toolbar,.monthbar button,.cal,.card.current{display:none!important}
+.print-title{display:block!important}.history{max-height:none}
+.card{background:#fff;border:1px solid #bbb;color:#111}
+.muted,.tip,.meta,.rec{color:#333!important}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>🏋️ FTL Workout</h1>
-<div class="sub">FTL Gym Pahlawan • mulai Senin, 21 September 2026 • 19.30 WIB</div>
+<h1>🏋️ FTL Gym Pahlawan — Calendar & History</h1>
+<div class="sub">Jadwal mulai Senin, 21 September 2026 • 19.30 WIB</div>
 
-<div class="card">
-<div class="stats"><div class="stat">Workout<b id="statWorkout">0</b></div><div class="stat">Checklist<b id="statCheck">0%</b></div><div class="stat">Streak<b id="statStreak">0 🔥</b></div></div>
+<div class="toolbar">
+<button class="btn" onclick="prevMonth()">‹ Bulan</button>
+<button class="btn" onclick="goToday()">Hari ini</button>
+<button class="btn" onclick="nextMonth()">Bulan ›</button>
+<button class="btn primary" onclick="printHistory()">🖨️ Save History PDF</button>
 </div>
 
-<div class="toolbar no-print">
-<button class="btn primary" onclick="show('calendar')">📅 Workout</button>
-<button class="btn" onclick="goToday()">📍 Hari Ini</button>
-<button class="btn" onclick="show('profile')">👤 Profile</button>
-<button class="btn" onclick="window.print()">🖨️ PDF</button>
-<button class="btn" onclick="backupData()">⬇️ Backup</button>
-<button class="btn" onclick="document.getElementById('restoreFile').click()">⬆️ Restore</button>
-<input id="restoreFile" class="hidden" type="file" accept=".json" onchange="restoreData(event)">
-</div>
-
-<section id="calendar">
 <div class="card">
-<div class="monthbar"><button class="btn nav" onclick="moveMonth(-1)">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn nav" onclick="moveMonth(1)">›</button></div>
+<div class="monthbar"><button class="btn nav" onclick="prevMonth()">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn nav" onclick="nextMonth()">›</button></div>
 <div class="cal" id="calendar"></div>
 </div>
-<div class="card"><div id="selectedTitle"></div><div id="workout"></div></div>
-<div class="card no-print">
-<b>💾 Data</b>
-<div class="meta">History tersimpan otomatis di browser perangkat ini. Backup dapat dipakai untuk memindahkan data ke perangkat/browser lain.</div>
-<button class="btn" style="margin-top:10px" onclick="clearData()">🗑️ Hapus Semua Data</button>
-</div>
-<div class="card"><b>📋 Riwayat</b><div class="history" id="history"></div></div>
-</section>
 
-<section id="profile" class="hidden">
-<div class="card">
-<b>👤 Profile</b>
-<div class="meta">Nama</div><input id="pName" type="text" style="width:100%;margin-top:4px">
-<div class="meta" style="margin-top:10px">Berat awal (kg)</div><input id="pStart" type="number" style="width:100%;margin-top:4px">
-<div class="meta" style="margin-top:10px">Target berat (kg)</div><input id="pTarget" type="number" style="width:100%;margin-top:4px">
-<button class="btn primary" style="margin-top:12px" onclick="saveProfile()">💾 Simpan</button>
+<div class="card current">
+<div id="selectedTitle"></div>
+<div id="workout"></div>
 </div>
-<div class="card"><div class="muted">Mode GitHub: tidak memakai Google Sheet/login. Data tersimpan lokal di browser perangkat ini. Gunakan Backup untuk menyimpan salinan history.</div></div>
-</section>
+
+<div class="card">
+<div class="print-title"><h2>FTL Gym — Workout History</h2><p>Checklist dan bobot latihan yang tersimpan</p></div>
+<div style="font-weight:700;margin-bottom:7px">📋 Riwayat Checklist</div>
+<div class="history" id="history"></div>
+</div>
+
+<div class="card current">
+<div class="name">📈 Aturan Progressive Overload</div>
+<div class="tip" style="margin-top:7px">Jika semua set mencapai batas atas repetisi dengan teknik bagus dan masih terasa mudah → naik 2,5–5 kg. Jika belum mencapai batas bawah atau teknik rusak → turunkan 2,5–5 kg.</div>
+</div>
 </div>
 
 <script>
 const plans={
-1:{title:"Upper Body + Cardio",items:[["Wide Chest Press",30,"3 × 8–12"],["Lat Pulldown",30,"3 × 8–12"],["Seated Row",30,"3 × 8–12"],["Shoulder Press",20,"3 × 8–12"],["Butterfly / Pec Deck",25,"2 × 12–15"],["Biceps Curl / Cable Curl",15,"2 × 10–15"],["Triceps Pushdown",20,"2 × 10–15"]],cardio:"Treadmill 20 menit — 5 menit pemanasan + 15 menit jalan cepat, incline 3–6%."},
-2:{title:"Lower Body",items:[["Smith Squat",20,"3 × 8–12"],["Leg Press",60,"3 × 10–12"],["Leg Extension",20,"3 × 10–15"],["Leg Curl",20,"3 × 10–15"],["Hip Thrust Machine",30,"3 × 8–12"],["Seated Calf Raise",25,"3 × 12–15"],["Abdominal Machine",20,"3 × 12–15"]]},
+1:{title:"Upper Body + Cardio",items:[["Wide Chest Press",30,"3 × 8–12","90 dtk"],["Lat Pulldown",30,"3 × 8–12","90 dtk"],["Seated Row",30,"3 × 8–12","90 dtk"],["Shoulder Press",20,"3 × 8–12","90 dtk"],["Butterfly / Pec Deck",25,"2 × 12–15","60 dtk"],["Biceps Curl / Cable Curl",15,"2 × 10–15","60 dtk"],["Triceps Pushdown",20,"2 × 10–15","60 dtk"]],cardio:"Treadmill 20 menit — 5 menit pemanasan + 15 menit jalan cepat, incline 3–6%."},
+2:{title:"Lower Body",items:[["Smith Squat",20,"3 × 8–12","90–120 dtk"],["Leg Press",60,"3 × 10–12","90–120 dtk"],["Leg Extension",20,"3 × 10–15","60–90 dtk"],["Leg Curl",20,"3 × 10–15","60–90 dtk"],["Hip Thrust Machine",30,"3 × 8–12","90 dtk"],["Seated Calf Raise",25,"3 × 12–15","60–90 dtk"],["Abdominal Machine",20,"3 × 12–15","60 dtk"]]},
 3:{title:"Cardio LISS",items:[],cardio:"Treadmill 35–45 menit ATAU stationary bike / elliptical 30–45 menit. Intensitas ringan–sedang; masih bisa ngobrol."},
-4:{title:"Upper Body",items:[["Incline / Chest Press",25,"3 × 8–12"],["Lat Pulldown",30,"3 × 8–12"],["Seated Cable Row",30,"3 × 8–12"],["Shoulder Press",20,"3 × 8–12"],["Butterfly / Pec Deck",25,"2 × 12–15"],["Lateral Raise",5,"3 × 12–15"],["Biceps Curl / Cable Curl",15,"2 × 10–15"],["Triceps Pushdown",20,"2 × 10–15"]],cardio:"Opsional: treadmill 10–15 menit santai."},
-5:{title:"Lower Body + Cardio",items:[["Smith Squat",20,"3 × 8–10"],["Leg Press",60,"3 × 10–12"],["Hip Thrust Machine",30,"3 × 8–12"],["Leg Curl",20,"3 × 10–15"],["Leg Extension",20,"2 × 12–15"],["Calf Machine",25,"3 × 12–15"],["Abdominal Machine",20,"3 × 12–15"]],cardio:"Treadmill 15–20 menit jalan cepat."},
-6:{title:"Full Body — Ringan",items:[["Chest Press",25,"2 × 10–12"],["Lat Pulldown",25,"2 × 10–12"],["Leg Press",50,"2 × 10–12"],["Seated Row",25,"2 × 10–12"],["Shoulder Press",15,"2 × 10–12"],["Leg Curl",20,"2 × 12–15"],["Abdominal Machine",20,"3 × 12–15"]],cardio:"Opsional: treadmill 15–20 menit santai."},
-0:{title:"Rest & Recovery",items:[],cardio:"Istirahat. Boleh jalan santai dan stretching ringan."}};
-let checks=JSON.parse(localStorage.getItem("ftl_checks")||"{}"),weights=JSON.parse(localStorage.getItem("ftl_weights")||"{}"),profile=JSON.parse(localStorage.getItem("ftl_profile")||"{}");
-let selected=new Date(),view=new Date(selected.getFullYear(),selected.getMonth(),1);
-const pad=n=>String(n).padStart(2,"0"),key=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+4:{title:"Upper Body",items:[["Incline / Chest Press",25,"3 × 8–12","90 dtk"],["Lat Pulldown",30,"3 × 8–12","90 dtk"],["Seated Cable Row",30,"3 × 8–12","90 dtk"],["Shoulder Press",20,"3 × 8–12","90 dtk"],["Butterfly / Pec Deck",25,"2 × 12–15","60 dtk"],["Lateral Raise",5,"3 × 12–15","60 dtk"],["Biceps Curl / Cable Curl",15,"2 × 10–15","60 dtk"],["Triceps Pushdown",20,"2 × 10–15","60 dtk"]],cardio:"Opsional: treadmill 10–15 menit santai."},
+5:{title:"Lower Body + Cardio",items:[["Smith Squat",20,"3 × 8–10","90–120 dtk"],["Leg Press",60,"3 × 10–12","90–120 dtk"],["Hip Thrust Machine",30,"3 × 8–12","90 dtk"],["Leg Curl",20,"3 × 10–15","60–90 dtk"],["Leg Extension",20,"2 × 12–15","60–90 dtk"],["Calf Machine",25,"3 × 12–15","60–90 dtk"],["Abdominal Machine",20,"3 × 12–15","60 dtk"]],cardio:"Treadmill 15–20 menit jalan cepat."},
+6:{title:"Full Body — Ringan",items:[["Chest Press",25,"2 × 10–12","90 dtk"],["Lat Pulldown",25,"2 × 10–12","90 dtk"],["Leg Press",50,"2 × 10–12","90 dtk"],["Seated Row",25,"2 × 10–12","90 dtk"],["Shoulder Press",15,"2 × 10–12","90 dtk"],["Leg Curl",20,"2 × 12–15","60–90 dtk"],["Abdominal Machine",20,"3 × 12–15","60 dtk"]],cardio:"Opsional: treadmill 15–20 menit santai."},
+0:{title:"Rest & Recovery",items:[],cardio:"Istirahat. Boleh jalan santai dan stretching ringan."}
+};
+
+let now=new Date();
+let view=new Date(now.getFullYear(),now.getMonth(),1);
+let selectedKey=key(now);
+let weights=JSON.parse(localStorage.getItem("ftlWeights")||"{}");
+let checks=JSON.parse(localStorage.getItem("ftlChecks")||"{}");
+
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmt=d=>d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
-function plan(d){return plans[d.getDay()]}
-function save(){localStorage.setItem("ftl_checks",JSON.stringify(checks));localStorage.setItem("ftl_weights",JSON.stringify(weights));renderAll()}
-function renderCal(){let y=view.getFullYear(),m=view.getMonth(),first=new Date(y,m,1),last=new Date(y,m+1,0),start=(first.getDay()+6)%7,h='<div class="dow">Sen</div><div class="dow">Sel</div><div class="dow">Rab</div><div class="dow">Kam</div><div class="dow">Jum</div><div class="dow">Sab</div><div class="dow">Min</div>';for(let i=0;i<start;i++)h+='<div class="date empty"></div>';for(let d=1;d<=last.getDate();d++){let x=new Date(y,m,d),k=key(x),p=plan(x),done=p.items.length&&p.items.every((_,i)=>checks[k]?.[i]);h+='<div class="date '+(key(x)==key(new Date())?'today ':'')+(key(x)==key(selected)?'selected ':'')+(done?'done':'')+'" onclick="selectDate('+d+')"><div class="num">'+d+'</div><div class="type">'+p.title+'</div></div>'}document.getElementById("calendar").innerHTML=h;document.getElementById("monthTitle").textContent=view.toLocaleDateString("id-ID",{month:"long",year:"numeric"})}
-function selectDate(d){selected=new Date(view.getFullYear(),view.getMonth(),d);renderAll()}
-function renderWorkout(){let k=key(selected),p=plan(selected),completed=p.items.length?p.items.filter((_,i)=>checks[k]?.[i]).length:0,pct=p.items.length?Math.round(completed/p.items.length*100):0,h='<h3 style="margin:0 0 6px">📅 '+fmt(selected)+'</h3><div class="green">'+p.title+'</div>';if(!p.items.length){h+='<p class="muted">'+(p.cardio||"Rest")+'</p>'}else{
-h+='<div class="meta" style="margin-top:8px">Progress hari ini: <b class="green">'+completed+'/'+p.items.length+' ('+pct+'%)</b></div>';h+='<div style="margin-top:10px">';p.items.forEach((it,i)=>{let w=weights[k+"_"+i]??it[1],c=!!checks[k]?.[i];h+='<div class="row" style="padding:10px 0;border-bottom:1px solid #263a32"><input type="checkbox" '+(c?'checked':'')+' onchange="toggle('+i+',this.checked)"><div class="grow"><div class="name">'+it[0]+'</div><div class="meta">'+it[2]+'</div><div class="rec">Awal '+it[1]+' kg</div></div><input type="number" min="0" step="2.5" value="'+w+'" onchange="weight('+i+',this.value)"><span class="muted">kg</span></div>'});h+='</div>'}if(p.cardio)h+='<div class="card" style="margin-top:12px"><b>❤️ Cardio</b><div class="meta">'+p.cardio+'</div></div>';document.getElementById("selectedTitle").innerHTML="";document.getElementById("workout").innerHTML=h}
-function toggle(i,v){let k=key(selected);checks[k]??={};checks[k][i]=v;save()}function weight(i,v){let k=key(selected);weights[k+"_"+i]=Number(v)||0;save()}
-function renderHistory(){let keys=Object.keys(checks).sort().reverse(),h=keys.length?keys.map(k=>{let d=new Date(k+"T00:00:00"),p=plan(d),n=Object.values(checks[k]||{}).filter(Boolean).length;return '<div class="historyrow"><span><b>'+d.toLocaleDateString("id-ID")+'</b><br><span class="muted">'+p.title+'</span></span><span class="green">'+n+'/'+p.items.length+' ✓</span></div>'}).join(""):'<div class="muted" style="padding-top:10px">Belum ada riwayat.</div>';document.getElementById("history").innerHTML=h}
-function renderDash(){let days=Object.keys(checks),work=days.filter(k=>Object.values(checks[k]||{}).some(Boolean)).length,total=0,done=0;days.forEach(k=>{let d=new Date(k+"T00:00:00"),n=plan(d).items.length;total+=n;done+=Object.values(checks[k]||{}).filter(Boolean).length});let dates=new Set(days.filter(k=>Object.values(checks[k]||{}).some(Boolean)));let s=0,d=new Date();while(dates.has(key(d))){s++;d.setDate(d.getDate()-1)}document.getElementById("statWorkout").textContent=work;document.getElementById("statCheck").textContent=total?Math.round(done/total*100)+"%":"0%";document.getElementById("statStreak").textContent=s+" 🔥"}
-function loadProfile(){pName.value=profile.name||"";pStart.value=profile.start||"";pTarget.value=profile.target||""}function saveProfile(){profile={name:pName.value,start:Number(pStart.value)||0,target:Number(pTarget.value)||0};localStorage.setItem("ftl_profile",JSON.stringify(profile));alert("Profile tersimpan.");}
-function goToday(){selected=new Date();view=new Date(selected.getFullYear(),selected.getMonth(),1);show('calendar');renderAll()}
-function backupData(){let data={version:1,exportedAt:new Date().toISOString(),checks,weights,profile};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ftl-workout-backup-'+key(new Date())+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-function restoreData(e){let file=e.target.files[0];if(!file)return;let r=new FileReader();r.onload=()=>{try{let data=JSON.parse(r.result);if(!data.checks||!data.weights)throw new Error('Format backup tidak valid');checks=data.checks||{};weights=data.weights||{};profile=data.profile||{};localStorage.setItem('ftl_checks',JSON.stringify(checks));localStorage.setItem('ftl_weights',JSON.stringify(weights));localStorage.setItem('ftl_profile',JSON.stringify(profile));renderAll();loadProfile();alert('Backup berhasil dipulihkan.')}catch(err){alert('Backup tidak valid atau rusak.')}};r.readAsText(file);e.target.value=''}
-function clearData(){if(confirm('Hapus semua checklist, bobot, dan profile dari browser ini?')){checks={};weights={};profile={};localStorage.removeItem('ftl_checks');localStorage.removeItem('ftl_weights');localStorage.removeItem('ftl_profile');renderAll();loadProfile()}}
-function moveMonth(n){view=new Date(view.getFullYear(),view.getMonth()+n,1);renderAll()}function show(id){calendar.classList.toggle("hidden",id!=="calendar");profileTabToggle(id==="profile")}
-function profileTabToggle(v){document.getElementById("profile").classList.toggle("hidden",!v);document.getElementById("calendar").classList.toggle("hidden",v);if(v)loadProfile()}
-function renderAll(){renderCal();renderWorkout();renderHistory();renderDash()}
-renderAll();loadProfile();
+function planFor(d){return plans[d.getDay()]}
+
+function renderCalendar(){
+ const y=view.getFullYear(),m=view.getMonth();
+ document.getElementById("monthTitle").textContent=view.toLocaleDateString("id-ID",{month:"long",year:"numeric"});
+ const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+ let s=["Min","Sen","Sel","Rab","Kam","Jum","Sab"].map(x=>`<div class="dow">${x}</div>`).join("");
+ for(let i=0;i<first;i++)s+=`<div class="date empty"></div>`;
+ for(let n=1;n<=days;n++){
+  let d=new Date(y,m,n),k=key(d),p=planFor(d);
+  let done=checks[k]&&Object.values(checks[k]).some(Boolean);
+  s+=`<button class="date ${k===selectedKey?'selected':''} ${k===key(now)?'today':''} ${done?'done':''}" onclick="selectDate('${k}')"><div class="num">${n}</div><div class="type">${p.title}</div></button>`
+ }
+ document.getElementById("calendar").innerHTML=s;
+}
+
+function selectDate(k){selectedKey=k;renderCalendar();renderWorkout()}
+
+function renderWorkout(){
+ const d=new Date(selectedKey+"T12:00:00"),p=planFor(d);
+ document.getElementById("selectedTitle").innerHTML=`<h2 style="margin:0 0 4px">${fmt(d)}</h2><div class="meta">${p.title}</div>`;
+ let html="";
+ if(p.items.length){
+  p.items.forEach((x,i)=>{
+   let ck=checks[selectedKey]?.[i]||false,w=weights[selectedKey+"_"+i]??x[1];
+   html+=`<div class="card"><div class="row"><input type="checkbox" ${ck?"checked":""} onchange="setCheck(${i},this.checked)"><div class="grow"><div class="name">${i+1}. ${x[0]}</div><div class="meta">${x[2]} • Istirahat ${x[3]}</div><div class="rec">Rekomendasi awal: ${x[1]} kg</div></div><input type="number" min="0" step="1" value="${w}" onchange="setWeight('${selectedKey}_${i}',this.value)"></div></div>`
+  });
+ }
+ html+=`<div class="card"><div class="name">🏃 Cardio / Aktivitas</div><div class="tip" style="margin-top:6px">${p.cardio||""}</div></div>`;
+ document.getElementById("workout").innerHTML=html;
+ renderHistory();
+}
+
+function setCheck(i,v){
+ if(!checks[selectedKey])checks[selectedKey]={};
+ checks[selectedKey][i]=v;
+ localStorage.setItem("ftlChecks",JSON.stringify(checks));
+ renderCalendar();renderHistory();
+}
+
+function setWeight(k,v){
+ let n=Number(v);if(!Number.isFinite(n)||n<0)n=0;
+ weights[k]=n;localStorage.setItem("ftlWeights",JSON.stringify(weights));
+}
+
+function renderHistory(){
+ let rows=[];
+ Object.keys(checks).sort().reverse().forEach(k=>{
+  let d=new Date(k+"T12:00:00"),p=planFor(d),c=checks[k]||{};
+  let done=Object.values(c).filter(Boolean).length,total=p.items.length;
+  if(done||total===0)rows.push(`<div class="historyrow"><span><b>${fmt(d)}</b><br><span class="muted">${p.title}</span></span><span class="green">${total?done+"/"+total+" selesai":"Rest"}</span></div>`)
+ });
+ document.getElementById("history").innerHTML=rows.length?rows.join(""):`<div class="muted">Belum ada checklist tersimpan.</div>`;
+}
+
+function prevMonth(){view=new Date(view.getFullYear(),view.getMonth()-1,1);renderCalendar()}
+function nextMonth(){view=new Date(view.getFullYear(),view.getMonth()+1,1);renderCalendar()}
+function goToday(){view=new Date(now.getFullYear(),now.getMonth(),1);selectedKey=key(now);renderCalendar();renderWorkout()}
+function printHistory(){window.print()}
+
+renderCalendar();renderWorkout();
 if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
-</body></html>
+</body>
+</html>
