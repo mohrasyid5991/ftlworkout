@@ -20,10 +20,10 @@ button{font:inherit;cursor:pointer}
 .monthtitle{font-size:18px;font-weight:700}.nav{width:40px;height:40px;border-radius:10px}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:12px}
 .dow{text-align:center;color:#91a39a;font-size:11px;padding:4px}
-.date{min-height:62px;border:1px solid #294138;background:#0e1b16;border-radius:9px;padding:7px;text-align:left;color:#fff;position:relative}
+.date{min-height:72px;border:1px solid #294138;background:#0e1b16;border-radius:9px;padding:7px;text-align:left;color:#fff;position:relative;display:block;width:100%}
 .date.empty{opacity:.2}.date.today{outline:2px solid #0b8f68}
 .date.selected{background:#123b2d;border-color:#0b8f68}
-.date .num{font-weight:700}.date .type{font-size:10px;color:#9ddcc3;margin-top:5px;line-height:1.2}
+.date .num{font-weight:700;font-size:14px}.date .type{font-size:10px;color:#9ddcc3;margin-top:5px;line-height:1.2;display:block}
 .date.done:after{content:"✓";position:absolute;right:6px;bottom:4px;color:#79e0b5;font-weight:800;font-size:17px}
 .row{display:flex;align-items:center;gap:11px}.grow{flex:1;min-width:0}
 .name{font-weight:700;font-size:15px}.meta{color:#aeb9b3;font-size:12px;margin-top:4px}
@@ -59,6 +59,12 @@ body{background:#fff;color:#111}.wrap{max-width:none;padding:0}
 <div class="card">
 <div class="monthbar"><button class="btn nav" onclick="prevMonth()">‹</button><div class="monthtitle" id="monthTitle"></div><button class="btn nav" onclick="nextMonth()">›</button></div>
 <div class="cal" id="calendar"></div>
+</div>
+
+<div class="card">
+<div class="name">🏋️ Pilihan Jenis Workout</div>
+<div class="tip" style="margin:6px 0 10px">Jadwal otomatis mengikuti hari. Klik salah satu tanggal di kalender untuk melihat detail workout-nya.</div>
+<div id="workoutTypes" style="display:grid;gap:7px"></div>
 </div>
 
 <div class="card current">
@@ -100,6 +106,25 @@ const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const fmt=d=>d.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
 function planFor(d){return plans[d.getDay()]}
 
+function renderWorkoutTypes(){
+ const labels=[
+  ["Senin","Upper Body + Cardio"],
+  ["Selasa","Lower Body"],
+  ["Rabu","Cardio LISS"],
+  ["Kamis","Upper Body"],
+  ["Jumat","Lower Body + Cardio"],
+  ["Sabtu","Full Body — Ringan"],
+  ["Minggu","Rest & Recovery"]
+ ];
+ document.getElementById("workoutTypes").innerHTML=labels.map((x,i)=>`<button class="btn" style="text-align:left" onclick="selectWeekday(${i+1})"><b>${x[0]}</b><span class="muted"> — ${x[1]}</span></button>`).join("");
+}
+function selectWeekday(day){
+ let d=new Date(selectedKey+"T12:00:00");
+ let diff=day-d.getDay();
+ if(d.getDay()===0) diff=day===7?0:day;
+ d.setDate(d.getDate()+diff);
+ selectedKey=key(d);view=new Date(d.getFullYear(),d.getMonth(),1);renderCalendar();renderWorkout();renderWorkoutTypes();
+}
 function renderCalendar(){
  const y=view.getFullYear(),m=view.getMonth();
  document.getElementById("monthTitle").textContent=view.toLocaleDateString("id-ID",{month:"long",year:"numeric"});
